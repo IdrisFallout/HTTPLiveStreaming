@@ -1,39 +1,43 @@
-from typing import List
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import Response, HTMLResponse
-from pydantic import BaseModel
 import subprocess
+from fastapi import FastAPI
+from fastapi.responses import Response, HTMLResponse
 
 app = FastAPI()
-
-
-class Video(BaseModel):
-    file: UploadFile
+is_starting = True
 
 
 @app.get('/hls')
 def generate_hls():
-    input_file = 'E:/Videos/MetraverseClass.mp4'
-    output_path = 'output/'
+    input_file = 'D:\Multimedia\Shrek 2 (2004) [1080p]\Shrek.2.2004.1080p.BluRay.x264.YIFY.mp4'
+    output_path = 'output/output.m3u8'
 
-    # Generate HLS segments from the video using ffmpeg
-    # subprocess.call([
-    #     'ffmpeg', '-i', input_file, '-codec', 'copy', '-map', '0', '-f', 'hls', '-hls_time', '10', '-hls_list_size',
-    #     '0', f'{output_path}output.m3u8'
-    # ])
+    global is_starting
 
-    # Define the MIME type for HLS content
-    headers = {
-        'Content-Type': 'application/x-mpegURL'
-    }
+    if is_starting:
+        # Generate HLS segments from the video using ffmpeg
+        subprocess.call([
+            'ffmpeg', '-i', input_file, '-codec', 'copy', '-map', '0', '-f', 'hls', '-hls_time', '10', '-hls_list_size',
+            '0', f'{output_path}'
+        ])
+        is_starting = False
 
-    # Open the output file and return the HLS stream
-    with open(f'{output_path}output.m3u8', 'rb') as f:
-        content = f.read()
+    content = prefix_ts_urls(f'{output_path}')
+
     return Response(content=content, media_type="application/vnd.apple.mpegurl")
 
 
-@app.get('/hls/{segment}')
+def prefix_ts_urls(file_path):
+    prefix = "http://127.0.0.1:8000/output/"
+    with open(file_path, "r") as f:
+        lines = f.readlines()
+        for i, line in enumerate(lines):
+            if line.endswith(".ts\n"):
+                lines[i] = prefix + line
+    output = "".join(lines)
+    return output
+
+
+@app.get('/output/{segment}')
 async def hls(segment: str):
     with open(f'output/{segment}', 'rb') as f:
         content = f.read()

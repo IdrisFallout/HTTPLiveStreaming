@@ -1,35 +1,18 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Video Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-      video {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <video id="videoPlayer" controls></video>
-    <script>
-      if(Hls.isSupported()) {
-        var video = document.getElementById('videoPlayer');
-        var hls = new Hls();
-        hls.loadSource('http://localhost:8000/hls');
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-          video.play();
-        });
-      }
-      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = 'http://localhost:8000/hls';
-        video.addEventListener('loadedmetadata',function() {
-          video.play();
-        });
-      }
-    </script>
-  </body>
-</html>
+<!-- CSS  -->
+<link href="https://vjs.zencdn.net/7.2.3/video-js.css" rel="stylesheet">
 
-<!--exploring the technology used to stream media files seamlessly over the internet-->
+<!-- HTML -->
+<video id='hls-example' class="video-js vjs-default-skin" width="640" height="480" controls>
+    <source type="application/x-mpegURL" src="http://127.0.0.1:8000/hls">
+</video>
+
+<!-- JS code -->
+<!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+<script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
+<script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
+
+<script>
+    var player = videojs('hls-example');
+    player.play();
+</script>
