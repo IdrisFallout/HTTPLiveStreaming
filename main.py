@@ -1,3 +1,4 @@
+import os
 import subprocess
 from fastapi import FastAPI
 from fastapi.responses import Response, HTMLResponse
@@ -5,17 +6,23 @@ from fastapi.responses import Response, HTMLResponse
 app = FastAPI()
 is_starting = True
 
-# server_url = 'http://9eac-197-156-144-137.ngrok-free.app'
-server_url = 'http://127.0.0.1:8000'
+server_url = 'http://192.168.43.138:8000'
+
 
 @app.get('/hls')
 def generate_hls():
-    input_file = r'D:\Multimedia\The Lion King (2019) [BluRay] [1080p] [YTS.LT]\The.Lion.King.2019.1080p.BluRay.x264-[YTS.LT].mp4'
+    input_file = r'E:\Videos\VRExperience.mp4'
     output_path = 'output/output.m3u8'
 
     global is_starting
 
     if is_starting:
+        # Delete any file with .ts extension in input_path
+        media_folder = 'output'
+        ts_files = [f for f in os.listdir(media_folder) if f.endswith('.ts')]
+        for ts_file in ts_files:
+            os.remove(os.path.join(media_folder, ts_file))
+
         # Generate HLS segments from the video using ffmpeg
         subprocess.call([
             'ffmpeg', '-i', input_file, '-codec', 'copy', '-map', '0', '-f', 'hls', '-hls_time', '10', '-hls_list_size',
@@ -29,7 +36,8 @@ def generate_hls():
 
 
 def prefix_ts_urls(file_path):
-    prefix = f"{server_url}/output/"
+    # prefix = f"{server_url}/output/"
+    prefix = f"output/"
     with open(file_path, "r") as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
