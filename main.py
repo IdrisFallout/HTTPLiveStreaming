@@ -5,10 +5,12 @@ from fastapi.responses import Response, HTMLResponse
 app = FastAPI()
 is_starting = True
 
+# server_url = 'http://9eac-197-156-144-137.ngrok-free.app'
+server_url = 'http://127.0.0.1:8000'
 
 @app.get('/hls')
 def generate_hls():
-    input_file = 'D:\Multimedia\Shrek 2 (2004) [1080p]\Shrek.2.2004.1080p.BluRay.x264.YIFY.mp4'
+    input_file = r'D:\Multimedia\The Lion King (2019) [BluRay] [1080p] [YTS.LT]\The.Lion.King.2019.1080p.BluRay.x264-[YTS.LT].mp4'
     output_path = 'output/output.m3u8'
 
     global is_starting
@@ -27,7 +29,7 @@ def generate_hls():
 
 
 def prefix_ts_urls(file_path):
-    prefix = "http://127.0.0.1:8000/output/"
+    prefix = f"{server_url}/output/"
     with open(file_path, "r") as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
@@ -48,5 +50,12 @@ async def hls(segment: str):
 @app.get("/")
 async def get_index():
     with open("index.html", "r") as f:
-        html_content = f.read()
+        html_content = f.read().replace("{server_url}", server_url)
     return HTMLResponse(content=html_content, status_code=200)
+
+
+@app.get("/video")
+async def get_video():
+    with open("D:\Multimedia\Shrek The Third (2007) [1080p]\Shrek.The.Third.2007.1080p.HDDVD.x264.YIFY.mp4", "rb") as f:
+        content = f.read()
+    return Response(content=content, media_type="video/mp4")
