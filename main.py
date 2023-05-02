@@ -6,14 +6,12 @@ from fastapi.responses import Response, HTMLResponse
 app = FastAPI()
 is_starting = True
 
-server_url = 'http://192.168.43.138:8000'
+server_url = 'https://90c3-197-156-144-137.ngrok-free.app'
+input_file = r'C:\Users\HP\OneDrive\My Edits\2d-backery.mp4'
+output_path = 'output/output.m3u8'
 
 
-@app.get('/hls')
 def generate_hls():
-    input_file = r'E:\Videos\VRExperience.mp4'
-    output_path = 'output/output.m3u8'
-
     global is_starting
 
     if is_starting:
@@ -28,10 +26,16 @@ def generate_hls():
             'ffmpeg', '-i', input_file, '-codec', 'copy', '-map', '0', '-f', 'hls', '-hls_time', '10', '-hls_list_size',
             '0', f'{output_path}'
         ])
+
         is_starting = False
 
-    content = prefix_ts_urls(f'{output_path}')
 
+generate_hls()
+
+
+@app.get('/hls')
+def generate_hls():
+    content = prefix_ts_urls(f'{output_path}')
     return Response(content=content, media_type="application/vnd.apple.mpegurl")
 
 
