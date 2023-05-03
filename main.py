@@ -6,7 +6,7 @@ from fastapi.responses import Response, HTMLResponse
 app = FastAPI()
 is_starting = True
 
-server_url = 'https://90c3-197-156-144-137.ngrok-free.app'
+server_url = 'http://127.0.0.1:8000'
 input_file = r'C:\Users\HP\OneDrive\My Edits\2d-backery.mp4'
 output_path = 'output/output.m3u8'
 
